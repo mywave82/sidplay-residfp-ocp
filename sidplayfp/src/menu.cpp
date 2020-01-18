@@ -28,6 +28,8 @@
 #include <iomanip>
 #include <string>
 
+#include <unistd.h>
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -431,6 +433,16 @@ void ConsolePlayer::menu ()
     }
     cerr << endl;
 
+#if LIBSIDPLAYFP_VERSION_MAJ > 2 || LIBSIDPLAYFP_VERSION_MIN >= 1
+    consoleTable  (tableSeparator);
+    consoleTable (tableMiddle); cerr << "         FREQ  PW            [ W A V E F O R M S ]" << endl;
+
+    for (int i=0; i < tuneInfo->sidChips() * 3; i++)
+    {
+        consoleTable (tableMiddle); cerr << endl; // reserve space for the Voice 3 status
+    }
+#endif
+
     consoleTable (tableEnd);
 
     if (m_driver.file)
@@ -440,9 +452,120 @@ void ConsolePlayer::menu ()
 
     // Get all the text to the screen so music playback
     // is not disturbed.
-    if ( !m_quietLevel )
-        cerr << "00:00";
     cerr << flush;
+}
+
+void ConsolePlayer::refreshRegDump (void)
+{
+#if LIBSIDPLAYFP_VERSION_MAJ > 2 || LIBSIDPLAYFP_VERSION_MIN >= 1
+    uint8_t gatestoggled, syncstoggled, teststoggled;
+    uint8_t *registers;
+    const SidTuneInfo *tuneInfo = m_tune.getInfo();
+
+    cerr << "\x1b[" << tuneInfo->sidChips() * 3 + 1 << "A\r"; // Moves cursor X lines up
+
+    for (int j=0; j < tuneInfo->sidChips(); j++)
+    {
+        if (m_engine.getSidStatus(j, gatestoggled, syncstoggled, teststoggled, &registers))
+        {
+            for (int i=0; i < 3; i++)
+            {
+                consoleTable (tableMiddle);
+                consoleColour (red, true);
+
+                cerr << " Voice " << (j * 3 + i+1) << hex;
+
+                consoleColour (yellow, true);
+                cerr << " $" << setw(3) << setfill('0') << (registers[0x00 + i * 0x07] | ((registers[0x01 + i * 0x07] & 0x0f) << 8)) <<
+                        " $" << setw(3) << setfill('0') << (registers[0x02 + i * 0x07] | ((registers[0x03 + i * 0x07] & 0x0f) << 8));
+
+                if (gatestoggled & (0x01 << (2 * i)))
+                {
+                    consoleColour (green, true); // fresh gate ON
+                    cerr << " GATE";
+                } else if (gatestoggled & (0x02 << (2 * i)))
+                {
+                    consoleColour (red, true); // fresh gate OFF
+                    cerr << " gate";
+                } else if (registers[0x04 + i * 0x07] & 0x01)
+                {
+                    consoleColour (green, false); // maintain gate ON
+                    cerr << " GATE";
+                } else {
+                    consoleColour (red, false); // maintain gate OFF
+                    cerr << " gate";
+                }
+
+                if (registers[0x04 + i * 0x07] & 0x02)
+                {
+                    consoleColour (green, false); // maintain ring mod ON
+                    cerr << " RING";
+                } else {
+                    consoleColour (red, false); // maintain ring mod OFF
+                    cerr << " ring";
+                }
+
+                if (registers[0x04 + i * 0x07] & 0x10)
+                {
+                    consoleColour (green, false);
+                    cerr << " /\\/\\"; // triangle
+                } else {
+                    consoleColour (red, false);
+                    cerr << " ____";
+                }
+
+                if (registers[0x04 + i * 0x07] & 0x20)
+                {
+                    consoleColour (green, false);
+                    cerr << " ////"; // sawtooth
+                } else {
+                    consoleColour (red, false);
+                    cerr << " ____";
+                }
+
+                if (registers[0x04 + i * 0x07] & 0x40)
+                {
+                    consoleColour (green, false);
+                    cerr << " PULSE";
+                } else {
+                    consoleColour (red, false);
+                    cerr << " _____";
+                }
+
+                if (registers[0x04 + i * 0x07] & 0x80)
+                {
+                    consoleColour (green, false);
+                    cerr << " NOISE";
+                } else {
+                    consoleColour (red, false);
+                    cerr << " _____";
+                }
+
+                cerr << dec << endl;
+            }
+        } else {
+            consoleTable (tableMiddle); cerr << "???" << endl;
+            consoleTable (tableMiddle); cerr << "???" << endl;
+            consoleTable (tableMiddle); cerr << "???" << endl;
+        }
+    }
+
+    consoleTable (tableEnd);
+
+    if (m_driver.file)
+        cerr << "Creating audio file, please wait...";
+    else
+        cerr << "Playing, press ESC to stop...";
+
+    cerr << flush;
+#else
+    if (m_driver.file)
+        cerr << "\rCreating audio file, please wait...";
+    else
+        cerr << "\rPlaying, press ESC to stop...";
+    cerr << flush;
+
+#endif
 }
 
 // Set colour of text on console

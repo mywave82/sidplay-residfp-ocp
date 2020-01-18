@@ -96,6 +96,11 @@ void sidplayfp::mute(unsigned int sidNum, unsigned int voice, bool enable)
     sidplayer.mute(sidNum, voice, enable);
 }
 
+bool sidplayfp::getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers)
+{
+    return sidplayer.getSidStatus(sidNum, gatestoggle, syncstoggle, teststoggle, registers);
+}
+
 void sidplayfp::debug(bool enable, FILE *out)
 {
     sidplayer.debug(enable, out);

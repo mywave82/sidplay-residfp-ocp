@@ -156,6 +156,8 @@ public:
 
     void mute(unsigned int sidNum, unsigned int voice, bool enable);
 
+    bool getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers);
+
     const char *error() const { return m_errorString; }
 
     void setRoms(const uint8_t* kernal, const uint8_t* basic, const uint8_t* character);

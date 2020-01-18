@@ -142,6 +142,29 @@ public:
     void mute(unsigned int sidNum, unsigned int voice, bool enable);
 
     /**
+     * Get the status of the given SID chip.
+     *
+     * @param sidNum the SID chip, 0 for the first one, 1 for the second.
+     * @param gatestoggle, returns GATE changes since last time this function
+     *             was called. Bit 0, if voice 1 has been enabled. Bit 1 if
+     *             voice 1 has been disabled. Bit 2 and 3 for voice 2, bit
+     *             4 and 5 for voice 3.
+     * @param syncstoggle, returns SYNC changes since last time this function
+     *             was called. Bit 0, if voice 1 has been enabled. Bit 1 if
+     *             voice 1 has been disabled. Bit 2 and 3 for voice 2, bit
+     *             4 and 5 for voice 3.
+     * @param teststoggle, returns TEST changes since last time this function
+     *             was called. Bit 0, if voice 1 has been enabled. Bit 1 if
+     *             voice 1 has been disabled. Bit 2 and 3 for voice 2, bit
+     *             4 and 5 for voice 3.
+     * @param registers returns a pointer to an array 32 (only first 25 are
+     *             needed) entries long that gives the last known write-status
+     *             of the SID chip.
+     * @return true on sucess, false otherwise (invalid sidNum).
+     */
+    bool getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers);
+
+    /**
      * Get the current playing time.
      *
      * @return the current playing time measured in seconds.

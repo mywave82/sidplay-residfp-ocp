@@ -41,13 +41,47 @@ protected:
     virtual uint8_t read(uint_least8_t addr) = 0;
     virtual void write(uint_least8_t addr, uint8_t data) = 0;
 
+    uint8_t gatetoggles;
+    uint8_t synctoggles;
+    uint8_t testtoggles;
+
 public:
     virtual void reset(uint8_t volume) = 0;
 
     void reset() { reset(0); }
 
     // Bank functions
-    void poke(uint_least16_t address, uint8_t value) override { write(address & 0x1f, value); }
+    uint8_t lastpoke[0x20];
+    void poke(uint_least16_t address, uint8_t value) override
+    {
+        address &= 0x1f;
+        if ((address==0x04) && ((value ^ lastpoke[0x04]) & 0x01)) { gatetoggles|=0x01<<(value&(0x01)); } // GATE toggle for voice 1
+        if ((address==0x0b) && ((value ^ lastpoke[0x0b]) & 0x01)) { gatetoggles|=0x04<<(value&(0x01)); } // GATE toggle for voice 2
+        if ((address==0x12) && ((value ^ lastpoke[0x12]) & 0x01)) { gatetoggles|=0x10<<(value&(0x01)); } // GATE toggle for voice 3
+
+        if ((address==0x04) && ((value ^ lastpoke[0x04]) & 0x02)) { synctoggles|=0x01<<(value&(0x02)); } // SYNC toggle for voice 1
+        if ((address==0x0b) && ((value ^ lastpoke[0x0b]) & 0x02)) { synctoggles|=0x04<<(value&(0x02)); } // SYNC toggle for voice 2
+        if ((address==0x12) && ((value ^ lastpoke[0x12]) & 0x02)) { synctoggles|=0x10<<(value&(0x02)); } // SYNC toggle for voice 3
+
+        if ((address==0x04) && ((value ^ lastpoke[0x04]) & 0x04)) { synctoggles|=0x01<<(value&(0x04)); } // TEST toggle for voice 1
+        if ((address==0x0b) && ((value ^ lastpoke[0x0b]) & 0x04)) { synctoggles|=0x04<<(value&(0x04)); } // TEST toggle for voice 2
+        if ((address==0x12) && ((value ^ lastpoke[0x12]) & 0x04)) { synctoggles|=0x10<<(value&(0x04)); } // TEST toggle for voice 3
+
+        lastpoke[address] = value;
+        write(address & 0x1f, value);
+    }
+    // 1  = Voice 1 GATE has toggled into LOW state
+    // 2  = Voice 1 GATE has toggled into HIGH state
+    // 4  = Voice 2 GATE has toggled into LOW state
+    // 8  = Voice 2 GATE has toggled into HIGH state
+    // 16 = Voice 3 GATE has toggled into LOW state
+    // 32 = Voice 3 GATE has toggled into HIGH state
+    void getToggles(uint8_t& gates, uint8_t& sync, uint8_t& test)
+    {
+        gates = gatetoggles;
+        sync = synctoggles;
+        test = testtoggles;
+    }
     uint8_t peek(uint_least16_t address) override { return read(address & 0x1f); }
 };
 

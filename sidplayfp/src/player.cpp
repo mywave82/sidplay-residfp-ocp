@@ -720,9 +720,11 @@ void ConsolePlayer::updateDisplay()
     const uint_least32_t milliseconds = m_engine.timeMs();
     const uint_least32_t seconds = milliseconds / 1000;
 
+    refreshRegDump ();
+
     if (!m_quietLevel && (seconds != (m_timer.current / 1000)))
     {
-        cerr << "\b\b\b\b\b" << std::setw(2) << std::setfill('0')
+        cerr << std::setw(2) << std::setfill('0')
              << ((seconds / 60) % 100) << ':' << std::setw(2)
              << std::setfill('0') << (seconds % 60) << std::flush;
     }

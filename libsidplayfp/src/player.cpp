@@ -172,6 +172,19 @@ bool Player::load(SidTune *tune)
     return true;
 }
 
+bool Player::getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers)
+{
+    sidemu *s = m_mixer.getSid(sidNum);
+    if (s == nullptr)
+    {
+        *registers = nullptr;
+        return false;
+    }
+    s->getToggles(gatestoggle, syncstoggle, teststoggle);
+    *registers = s->lastpoke;
+    return true;
+}
+
 void Player::mute(unsigned int sidNum, unsigned int voice, bool enable)
 {
     sidemu *s = m_mixer.getSid(sidNum);

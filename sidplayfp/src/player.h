@@ -201,6 +201,7 @@ private:
     void updateDisplay();
     void emuflush       (void);
     void menu           (void);
+    void refreshRegDump (void);
 
     std::string getFileName(const SidTuneInfo *tuneInfo);
 
