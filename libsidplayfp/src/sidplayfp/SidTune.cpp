@@ -85,7 +85,7 @@ void SidTune::load(const char* fileName, bool separatorIsSlash)
     }
 }
 
-void SidTune::read(const uint_least8_t* sourceBuffer, uint_least32_t bufferLen)
+void SidTune::read(const uint8_t* sourceBuffer, uint_least32_t bufferLen)
 {
     try
     {

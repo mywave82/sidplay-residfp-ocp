@@ -100,7 +100,7 @@ public:  // ----------------------------------------------------------------
      * @return the sid tune
      * @throw loadError
      */
-    static SidTuneBase* read(const uint_least8_t* sourceBuffer, uint_least32_t bufferLen);
+    static SidTuneBase* read(const uint8_t* sourceBuffer, uint_least32_t bufferLen);
 
     /**
      * Select sub-song (0 = default starting song)
