@@ -36,6 +36,7 @@ namespace libsidplayfp
 class c64sid : public Bank
 {
 protected:
+    c64sid(void) : lastpoke{0} {};
     virtual ~c64sid() {}
 
     virtual uint8_t read(uint_least8_t addr) = 0;
