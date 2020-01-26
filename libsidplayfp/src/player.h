@@ -142,7 +142,7 @@ public:
 
     bool load(SidTune *tune);
 
-    uint_least32_t play(short *buffer, uint_least32_t samples);
+    uint_least32_t play(int16_t *buffer, uint_least32_t samples, std::vector<int16_t*> *rawBuffers = nullptr);
 
     bool isPlaying() const { return m_isPlaying != STOPPED; }
 

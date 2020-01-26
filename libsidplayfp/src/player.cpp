@@ -201,7 +201,7 @@ void Player::run(unsigned int events)
         m_c64.clock();
 }
 
-uint_least32_t Player::play(short *buffer, uint_least32_t count)
+uint_least32_t Player::play(int16_t *buffer, uint_least32_t count, std::vector<int16_t*> *rawBuffers)
 {
     // Make sure a tune is loaded
     if (m_tune == nullptr)
@@ -213,7 +213,7 @@ uint_least32_t Player::play(short *buffer, uint_least32_t count)
 
     if (m_isPlaying == PLAYING)
     {
-        m_mixer.begin(buffer, count);
+        m_mixer.begin(buffer, count, rawBuffers);
 
         try
         {

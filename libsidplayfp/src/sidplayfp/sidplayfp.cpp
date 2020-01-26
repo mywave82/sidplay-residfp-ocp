@@ -56,9 +56,9 @@ void sidplayfp::stop()
     sidplayer.stop();
 }
 
-uint_least32_t sidplayfp::play(short *buffer, uint_least32_t count)
+uint_least32_t sidplayfp::play(int16_t *buffer, uint_least32_t count, std::vector<int16_t *> *rawSamples)
 {
-    return sidplayer.play(buffer, count);
+    return sidplayer.play(buffer, count, rawSamples);
 }
 
 bool sidplayfp::load(SidTune *tune)

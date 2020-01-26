@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <vector>
 
 #include "sidplayfp/siddefs.h"
 #include "sidplayfp/sidversion.h"
@@ -108,7 +109,8 @@ public:
      * and #isPlaying() is true an error occurred, use #error() to get
      * a detailed message.
      */
-    uint_least32_t play(short *buffer, uint_least32_t count);
+    uint_least32_t play(int16_t *buffer, uint_least32_t count, std::vector<int16_t *> *rawSamples = nullptr);
+
 
     /**
      * Check if the engine is playing or stopped.

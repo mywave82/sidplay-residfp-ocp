@@ -60,7 +60,7 @@ ReSIDfp::ReSIDfp(sidbuilder *builder) :
     sidemu(builder),
     m_sid(*(new reSIDfp::SID))
 {
-    m_buffer = new short[OUTPUTBUFFERSIZE];
+    m_buffer = new int16_t[OUTPUTBUFFERSIZE];
     reset(0);
 }
 
@@ -104,7 +104,7 @@ void ReSIDfp::clock()
 {
     const event_clock_t cycles = eventScheduler->getTime(m_accessClk, EVENT_CLOCK_PHI1);
     m_accessClk += cycles;
-    m_bufferpos += m_sid.clock(cycles, m_buffer+m_bufferpos);
+    m_bufferpos += m_sid.clock(cycles, m_buffer + (m_bufferpos<<2));
 }
 
 void ReSIDfp::filter(bool enable)

@@ -22,6 +22,7 @@
 #ifndef RESID_SID_H
 #define RESID_SID_H
 
+#include <stdint.h>
 #include "resid-config.h"
 #include "voice.h"
 #if NEW_8580_FILTER
@@ -53,7 +54,7 @@ public:
 
   void clock();
   void clock(cycle_count delta_t);
-  int clock(cycle_count& delta_t, short* buf, int n, int interleave = 1);
+  int clock(cycle_count& delta_t, int16_t * buf, int n);
   void reset();
 
   // Read/write registers.
@@ -98,14 +99,15 @@ public:
   void input(short sample);
 
   // 16-bit output (AUDIO OUT).
+  int voice_lastvalue[3];
   short output();
 
  protected:
   static double I0(double x);
-  int clock_fast(cycle_count& delta_t, short* buf, int n, int interleave);
-  int clock_interpolate(cycle_count& delta_t, short* buf, int n, int interleave);
-  int clock_resample(cycle_count& delta_t, short* buf, int n, int interleave);
-  int clock_resample_fastmem(cycle_count& delta_t, short* buf, int n, int interleave);
+  int clock_fast(cycle_count& delta_t, int16_t * buf, int n);
+  int clock_interpolate(cycle_count& delta_t, int16_t * buf, int n);
+  int clock_resample(cycle_count& delta_t, int16_t * buf, int n);
+  int clock_resample_fastmem(cycle_count& delta_t, int16_t * buf, int n);
   void write();
 
   chip_model sid_model;
@@ -215,7 +217,10 @@ void SID::clock()
   }
 
   // Clock filter.
-  filter.clock(voice[0].output(), voice[1].output(), voice[2].output());
+  voice_lastvalue[0] = voice[0].output();
+  voice_lastvalue[1] = voice[1].output();
+  voice_lastvalue[2] = voice[2].output();
+  filter.clock(voice_lastvalue[0], voice_lastvalue[1], voice_lastvalue[2]);
 
   // Clock external filter.
   extfilt.clock(filter.output());

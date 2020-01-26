@@ -118,7 +118,8 @@ private:
      *
      * @return the output sample
      */
-    int output() const;
+    int voice_lastvalue[3];
+    int output();
 
     /**
      * Calculate the numebr of cycles according to current parameters
@@ -232,7 +233,7 @@ public:
      * @param buf audio output buffer
      * @return number of samples produced
      */
-    int clock(unsigned int cycles, short* buf);
+    int clock(unsigned int cycles, int16_t *buf);
 
     /**
      * Clock SID forward with no audio production.
@@ -298,18 +299,18 @@ void SID::ageBusValue(unsigned int n)
 }
 
 RESID_INLINE
-int SID::output() const
+int SID::output()
 {
-    const int v1 = voice[0]->output(voice[2]->wave());
-    const int v2 = voice[1]->output(voice[0]->wave());
-    const int v3 = voice[2]->output(voice[1]->wave());
+    voice_lastvalue[0] = voice[0]->output(voice[2]->wave());
+    voice_lastvalue[1] = voice[1]->output(voice[0]->wave());
+    voice_lastvalue[2] = voice[2]->output(voice[1]->wave());
 
-    return externalFilter->clock(filter->clock(v1, v2, v3));
+    return externalFilter->clock(filter->clock(voice_lastvalue[0], voice_lastvalue[1], voice_lastvalue[2]));
 }
 
 
 RESID_INLINE
-int SID::clock(unsigned int cycles, short* buf)
+int SID::clock(unsigned int cycles, int16_t* buf)
 {
     ageBusValue(cycles);
     int s = 0;
@@ -335,6 +336,9 @@ int SID::clock(unsigned int cycles, short* buf)
                 if (unlikely(resampler->input(output())))
                 {
                     buf[s++] = resampler->getOutput();
+                    buf[s++] = voice_lastvalue[0] / 32; /* scale down to 16bit */
+                    buf[s++] = voice_lastvalue[1] / 32;
+                    buf[s++] = voice_lastvalue[2] / 32;
                 }
             }
 
@@ -348,7 +352,7 @@ int SID::clock(unsigned int cycles, short* buf)
         }
     }
 
-    return s;
+    return s>>2;
 }
 
 } // namespace reSIDfp

@@ -47,9 +47,9 @@ class bufferMove
 {
 public:
     bufferMove(int p, int s) : pos(p), samples(s) {}
-    void operator()(short *dest)
+    void operator()(int16_t *dest)
     {
-        const short* src = dest + pos;
+        const int16_t* src = dest + pos;
         for (int j = 0; j < samples; j++)
         {
             dest[j] = src[j];
@@ -73,7 +73,7 @@ void Mixer::resetBufs()
 
 void Mixer::doMix()
 {
-    short *buf = m_sampleBuffer + m_sampleIndex;
+    int16_t *buf = m_sampleBuffer + m_sampleIndex;
 
     // extract buffer info now that the SID is updated.
     // clock() may update bufferpos.
@@ -99,13 +99,43 @@ void Mixer::doMix()
         for (size_t k = 0; k < m_buffers.size(); k++)
         {
             int_least32_t sample = 0;
-            const short *buffer = m_buffers[k] + i;
-            for (int j = 0; j < m_fastForwardFactor; j++)
+            const int16_t *buffer = m_buffers[k] + (i<<2);
+            int j;
+            for (j = 0; j < m_fastForwardFactor; j++)
             {
-                sample += buffer[j];
+                sample += buffer[j<<2];
             }
 
             m_iSamples[k] = sample / m_fastForwardFactor;
+            if (m_rawBuffers)
+            {
+                if (m_stereo)
+                {
+                    if (!buffer[(j << 2)-4])
+                    { fprintf (stderr, " \b"); }
+
+                    if (!buffer[(j << 2)-3])
+                    { fprintf (stderr, " \b"); }
+
+                    if (!buffer[(j << 2)-2])
+                    { fprintf (stderr, " \b"); }
+
+                    if (!buffer[(j << 2)-1])
+                    { fprintf (stderr, " \b"); }
+
+                 //(*m_rawBuffers)[k][(m_sampleIndex << 1) + 0] = m_buffers[k][(j << 2)-4];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 1) + 0] = m_iSamples[k];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 1) + 1] = buffer[(j << 2)-3];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 1) + 2] = buffer[(j << 2)-2];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 1) + 3] = buffer[(j << 2)-1];
+                } else {
+                  //(*m_rawBuffers)[k][(m_sampleIndex << 3) + 0] = m_buffers[k][(j << 2)-4];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 3) + 0] = m_iSamples[k];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 3) + 1] = buffer[(j << 2)-3];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 3) + 2] = buffer[(j << 2)-2];
+                    (*m_rawBuffers)[k][(m_sampleIndex << 3) + 3] = buffer[(j << 2)-1];
+                }
+            }
         }
 
         // increment i to mark we ate some samples, finish the boxcar thing.
@@ -118,22 +148,23 @@ void Mixer::doMix()
         {
             const int_least32_t tmp = ((this->*(m_mix[ch]))() * m_volume[ch] + dither) / VOLUME_MAX;
             assert(tmp >= -32768 && tmp <= 32767);
-            *buf++ = static_cast<short>(tmp);
+            *buf++ = static_cast<int16_t>(tmp);
             m_sampleIndex++;
         }
     }
 
     // move the unhandled data to start of buffer, if any.
     const int samplesLeft = sampleCount - i;
-    std::for_each(m_buffers.begin(), m_buffers.end(), bufferMove(i, samplesLeft));
+    std::for_each(m_buffers.begin(), m_buffers.end(), bufferMove(i<<2, samplesLeft<<2));
     std::for_each(m_chips.begin(), m_chips.end(), bufferPos(samplesLeft));
 }
 
-void Mixer::begin(short *buffer, uint_least32_t count)
+void Mixer::begin(int16_t *buffer, uint_least32_t count, std::vector<int16_t*> *rawBuffers)
 {
     m_sampleIndex  = 0;
     m_sampleCount  = count;
     m_sampleBuffer = buffer;
+    m_rawBuffers = rawBuffers;
 }
 
 void Mixer::updateParams()
