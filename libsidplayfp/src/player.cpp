@@ -324,9 +324,9 @@ bool Player::config(const SidConfig &cfg, bool force)
             sidCreate(cfg.sidEmulation, cfg.defaultSidModel, cfg.digiBoost, cfg.forceSidModel, addresses);
 
             // Determine clock speed
-            const c64::model_t model = c64model(cfg.defaultC64Model, cfg.forceC64Model);
+            m_model = c64model(cfg.defaultC64Model, cfg.forceC64Model);
 
-            m_c64.setModel(model);
+            m_c64.setModel(m_model);
             m_c64.setCiaModel(cfg.ciaModel);
 
             sidParams(m_c64.getMainCpuSpeed(), cfg.frequency, cfg.samplingMethod, cfg.fastSampling);

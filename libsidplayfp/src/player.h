@@ -63,6 +63,7 @@ private:
 private:
     /// Commodore 64 emulator
     c64 m_c64;
+    c64::model_t m_model;
 
     /// Mixer
     Mixer m_mixer;
@@ -135,6 +136,8 @@ public:
     const SidConfig &config() const { return m_cfg; }
 
     const SidInfo &info() const { return m_info; }
+
+    c64::model_t getModel () const { return m_model; }
 
     bool config(const SidConfig &cfg, bool force=false);
 
