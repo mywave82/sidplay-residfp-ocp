@@ -139,6 +139,8 @@ public:
 
     c64::model_t getModel () const { return m_model; }
 
+    double getMainCpuSpeed () const { return m_c64.getMainCpuSpeed(); }
+
     bool config(const SidConfig &cfg, bool force=false);
 
     bool fastForward(unsigned int percent);
