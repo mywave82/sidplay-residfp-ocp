@@ -447,7 +447,7 @@ c64::model_t Player::c64model(SidConfig::c64_model_t defaultModel, bool forced)
  * @param defaultModel the default model
  * @param forced true if the default model shold be forced in spite of tune model
  */
-SidConfig::sid_model_t getSidModel(SidTuneInfo::model_t sidModel, SidConfig::sid_model_t defaultModel, bool forced)
+SidConfig::sid_model_t makeSidModel(SidTuneInfo::model_t sidModel, SidConfig::sid_model_t defaultModel, bool forced)
 {
     SidTuneInfo::model_t tuneModel = sidModel;
 
@@ -510,12 +510,17 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
         const SidTuneInfo* tuneInfo = m_tune->getInfo();
 
         // Setup base SID
-        const SidConfig::sid_model_t userModel = getSidModel(tuneInfo->sidModel(0), defaultModel, forced);
+        const SidConfig::sid_model_t userModel = makeSidModel(tuneInfo->sidModel(0), defaultModel, forced);
         sidemu *s = builder->lock(m_c64.getEventScheduler(), userModel, digiboost);
         if (!builder->getStatus())
         {
             throw configError(builder->error());
         }
+
+        m_sidModels.clear();
+        m_sidAddresses.clear();
+        m_sidModels.push_back(userModel);
+        m_sidAddresses.push_back(0xd400);
 
         m_c64.setBaseSid(s);
         m_mixer.addSid(s);
@@ -531,7 +536,7 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
 
             for (unsigned int i = 0; i < extraSidChips; i++)
             {
-                const SidConfig::sid_model_t userModel = getSidModel(tuneInfo->sidModel(i+1), defaultModel, forced);
+                const SidConfig::sid_model_t userModel = makeSidModel(tuneInfo->sidModel(i+1), defaultModel, forced);
 
                 sidemu *s = builder->lock(m_c64.getEventScheduler(), userModel, digiboost);
                 if (!builder->getStatus())
@@ -539,6 +544,8 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
                     throw configError(builder->error());
                 }
 
+                m_sidModels.push_back(userModel);
+                m_sidAddresses.push_back(extraSidAddresses[i]);
                 if (!m_c64.addExtraSid(s, extraSidAddresses[i]))
                     throw configError(ERR_UNSUPPORTED_SID_ADDR);
 
