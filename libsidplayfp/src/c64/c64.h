@@ -54,6 +54,16 @@ namespace libsidplayfp
 class c64sid;
 class sidmemory;
 
+typedef struct
+{
+    double colorBurst;         ///< Colorburst frequency in Herz
+    double divider;            ///< Clock frequency divider
+    double powerFreq;          ///< Power line frequency in Herz
+    MOS656X::model_t vicModel; ///< Video chip model
+} model_data_t;
+
+extern const model_data_t modelData[];
+
 #ifdef PC64_TESTSUITE
 class testEnv
 {
