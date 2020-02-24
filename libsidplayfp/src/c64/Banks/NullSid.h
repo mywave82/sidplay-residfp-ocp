@@ -52,6 +52,8 @@ public:
 
     void write(uint_least8_t, uint8_t) override {}
     uint8_t read(uint_least8_t) override { return 0xff; }
+
+    void GetVolumes(uint8_t &a, uint8_t &b, uint8_t &c) const override {a = b = c = 0;};
 };
 
 }

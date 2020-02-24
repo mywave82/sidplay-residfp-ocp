@@ -101,6 +101,7 @@ public:
   // 16-bit output (AUDIO OUT).
   int voice_lastvalue[3];
   short output();
+  short voice_volume(int voice) const;
 
  protected:
   static double I0(double x);

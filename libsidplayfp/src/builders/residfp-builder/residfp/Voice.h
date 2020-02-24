@@ -65,6 +65,12 @@ public:
         return static_cast<int>(waveformGenerator->output(ringModulator) * envelopeGenerator->output());
     }
 
+    RESID_INLINE
+    float volume(void) const
+    {
+        return envelopeGenerator->output();
+    }
+
     /**
      * Constructor.
      */

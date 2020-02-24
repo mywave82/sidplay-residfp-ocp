@@ -1041,4 +1041,9 @@ int SID::clock_resample_fastmem(cycle_count& delta_t, int16_t * buf, int n)
   return s>>2;
 }
 
+short SID::voice_volume(int i) const
+{
+  return voice[i].envelope.output();
+}
+
 } // namespace reSID

@@ -267,6 +267,8 @@ public:
      * @param enable false to turn off filter emulation
      */
     void enableFilter(bool enable);
+
+    void volumes(float &a, float &b, float &c) const;
 };
 
 } // namespace reSIDfp
@@ -353,6 +355,14 @@ int SID::clock(unsigned int cycles, int16_t* buf)
     }
 
     return s>>2;
+}
+
+RESID_INLINE
+void SID::volumes(float &a, float &b, float &c) const
+{
+    a = voice[0]->volume();
+    b = voice[1]->volume();
+    c = voice[2]->volume();
 }
 
 } // namespace reSIDfp

@@ -84,6 +84,8 @@ public:
         test = testtoggles;
     }
     uint8_t peek(uint_least16_t address) override { return read(address & 0x1f); }
+
+    virtual void GetVolumes(uint8_t &a, uint8_t &b, uint8_t &c) const = 0;
 };
 
 }

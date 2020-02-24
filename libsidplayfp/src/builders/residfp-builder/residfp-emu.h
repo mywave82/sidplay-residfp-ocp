@@ -72,6 +72,8 @@ public:
     void filter(bool enable);
     void filter6581Curve(double filterCurve);
     void filter8580Curve(double filterCurve);
+
+    void GetVolumes(uint8_t&, uint8_t&, uint8_t&) const override;
 };
 
 }

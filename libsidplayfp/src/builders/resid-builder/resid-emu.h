@@ -74,6 +74,8 @@ public:
     // Specific to resid
     void bias(double dac_bias);
     void filter(bool enable);
+
+    void GetVolumes(uint8_t &a, uint8_t &b, uint8_t &c) const override;
 };
 
 }

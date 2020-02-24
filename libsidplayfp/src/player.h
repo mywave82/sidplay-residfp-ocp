@@ -168,7 +168,7 @@ public:
 
     void mute(unsigned int sidNum, unsigned int voice, bool enable);
 
-    bool getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers);
+    bool getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers, uint8_t &volume_a, uint8_t &volume_b, uint8_t &volume_c);
 
     const char *error() const { return m_errorString; }
 

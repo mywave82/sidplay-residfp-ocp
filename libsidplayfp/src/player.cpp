@@ -172,7 +172,7 @@ bool Player::load(SidTune *tune)
     return true;
 }
 
-bool Player::getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers)
+bool Player::getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& syncstoggle, uint8_t& teststoggle, uint8_t **registers, uint8_t &volume_a, uint8_t &volume_b, uint8_t &volume_c)
 {
     sidemu *s = m_mixer.getSid(sidNum);
     if (s == nullptr)
@@ -182,6 +182,7 @@ bool Player::getSidStatus(unsigned int sidNum, uint8_t& gatestoggle, uint8_t& sy
     }
     s->getToggles(gatestoggle, syncstoggle, teststoggle);
     *registers = s->lastpoke;
+    s->GetVolumes(volume_a, volume_b, volume_c);
     return true;
 }
 

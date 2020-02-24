@@ -172,4 +172,14 @@ void ReSID::model(SidConfig::sid_model_t model, bool digiboost)
     m_status = true;
 }
 
+void ReSID::GetVolumes(uint8_t &a, uint8_t &b, uint8_t &c) const
+{
+    int _a = m_sid.voice_volume(0);
+    int _b = m_sid.voice_volume(1);
+    int _c = m_sid.voice_volume(2);
+    if (_a < 0) a = 0; else if (_a > 255) a = 255; else a = _a;
+    if (_b < 0) b = 0; else if (_b > 255) b = 255; else b = _b;
+    if (_c < 0) c = 0; else if (_c > 255) c = 255; else c = _c;
+}
+
 }

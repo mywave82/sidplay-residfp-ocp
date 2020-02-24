@@ -170,4 +170,22 @@ void ReSIDfp::model(SidConfig::sid_model_t model, bool digiboost)
     m_status = true;
 }
 
+
+void ReSIDfp::GetVolumes(uint8_t &a, uint8_t &b, uint8_t &c) const
+{
+	float _a = 0.0f;
+	float _b = 0.0f;
+	float _c = 0.0f;
+
+	m_sid.volumes (_a, _b, _c);
+
+	_a *= 0x8000;
+	_b *= 0x8000;
+	_c *= 0x8000;
+
+	if (_a < 0.0) a = 0; else if (_a > 255.0) a = 255; else a = _a;
+	if (_b < 0.0) b = 0; else if (_b > 255.0) b = 255; else b = _b;
+	if (_c < 0.0) c = 0; else if (_c > 255.0) c = 255; else c = _c;
+}
+
 }
