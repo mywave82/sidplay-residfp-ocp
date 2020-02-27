@@ -111,18 +111,6 @@ void Mixer::doMix()
             {
                 if (m_stereo)
                 {
-                    if (!buffer[(j << 2)-4])
-                    { fprintf (stderr, " \b"); }
-
-                    if (!buffer[(j << 2)-3])
-                    { fprintf (stderr, " \b"); }
-
-                    if (!buffer[(j << 2)-2])
-                    { fprintf (stderr, " \b"); }
-
-                    if (!buffer[(j << 2)-1])
-                    { fprintf (stderr, " \b"); }
-
                  //(*m_rawBuffers)[k][(m_sampleIndex << 1) + 0] = m_buffers[k][(j << 2)-4];
                     (*m_rawBuffers)[k][(m_sampleIndex << 1) + 0] = m_iSamples[k];
                     (*m_rawBuffers)[k][(m_sampleIndex << 1) + 1] = buffer[(j << 2)-3];
